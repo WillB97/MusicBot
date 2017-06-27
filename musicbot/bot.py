@@ -973,9 +973,13 @@ class MusicBot(discord.Client):
                         drop_count += 1
                         # Im pretty sure there's no situation where this would ever break
                         # Unless the first entry starts being played, which would make this a race condition
-                if drop_count:
-                    print("Dropped %s songs" % drop_count)
-
+                    else:
+                        print("[Queued] ({}) [{}] {} ".format(e.title, str(timedelta(seconds=e.duration)).lstrip('0').lstrip(':'), e.url), flush = True)
+                    if drop_count:
+                        print("Dropped %s songs" % drop_count)
+            else:
+                for e in entry_list.copy():
+                    print("[Queued] ({}) [{}] {} ".format(e.title, str(timedelta(seconds=e.duration)).lstrip('0').lstrip(':'), e.url), flush = True)
             print("Processed {} songs in {} seconds at {:.2f}s/song, {:+.2g}/song from expected ({}s)".format(
                 listlen,
                 self._fixg(ttime),
@@ -1017,6 +1021,8 @@ class MusicBot(discord.Client):
 
             reply_text = "Enqueued **%s** to be played. Position in queue: %s"
             btext = entry.title
+			
+            print("[Queued] ({}) [{}] {} ".format(entry.title, str(timedelta(seconds=entry.duration)).lstrip('0').lstrip(':'), entry.url))
 
         if position == 1 and player.is_stopped:
             position = 'Up next!'
@@ -1843,7 +1849,7 @@ class MusicBot(discord.Client):
             return
 
         else:
-            self.safe_print("[Command] {0.id}/{0.name} ({1})".format(message.author, message_content))
+            self.safe_print("{2} [Command] {0.id}/{0.name} ({1})".format(message.author, message_content, time.strftime('%y-%m-%d %H:%M:%S')))
 
         user_permissions = self.permissions.for_user(message.author)
 

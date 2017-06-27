@@ -2,7 +2,10 @@ import asyncio
 import json
 import os
 import traceback
+import csv
+import time
 
+from datetime import timedelta
 from .exceptions import ExtractionError
 from .utils import get_header, md5sum
 
@@ -207,14 +210,18 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
     # noinspection PyShadowingBuiltins
     async def _really_download(self, *, hash=False):
-        print("[Download] Started:", self.url)
+        print("[Download] Started: {} ({})".format(self.url, self.title), flush = True)
 
         try:
             result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True)
         except Exception as e:
             raise ExtractionError(e)
 
-        print("[Download] Complete:", self.url)
+        print("[Download] Complete: {} ({})".format(self.url, self.title), flush = True)
+
+        with open('SongLog.csv', 'a', newline='') as csvfile:
+            songWriter = csv.writer(csvfile, delimiter='\t')
+            songWriter.writerow([time.strftime('%y-%m-%d %H:%M:%S'), str(timedelta(seconds=self.duration)).lstrip('0').lstrip(':'), self.title, self.url, self.meta['author'].name])
 
         if result is None:
             raise ExtractionError("ytdl broke and hell if I know why")
