@@ -10,3 +10,5 @@ config/options.ini
 config/permissions.ini
 
 SongLog.csv
+
+CMDlog
